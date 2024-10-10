@@ -1,0 +1,60 @@
+Upload libraries
+
+library(magrittr)
+library(httr)
+library(jsonlite)
+library(purrr)
+library(dplyr)
+
+# Upload CSV file 
+data <- read.csv('NameOFinterestFILE.csv')
+
+# Extract of inChIKeys column
+InChI_Keys <- data$InChIKey
+
+# Request permission to process clasification in ClassyFire
+get_classification_custom <- function(inchi_key) {
+  url <- paste0("http://classyfire.wishartlab.com/entities/", inchi_key, ".json")
+  
+  # Request permission to API
+  response <- tryCatch(GET(url), error = function(e) NULL)
+  
+  if (!is.null(response) && status_code(response) == 200) {
+    json_data <- content(response, "text", encoding = "UTF-8")
+    classification <- fromJSON(json_data)
+    
+    # Check if the information exists
+    list(
+      InChIKey = inchi_key,
+      Superclass = ifelse(!is.null(classification$superclass$name), classification$superclass$name, NA),
+      Class = ifelse(!is.null(classification$class$name), classification$class$name, NA),
+      Subclass = ifelse(!is.null(classification$subclass$name), classification$subclass$name, NA)
+    )
+  } else {
+    # Return structure in case of error
+    list(
+      InChIKey = inchi_key,
+      Superclass = NA,
+      Class = NA,
+      Subclass = NA,
+      Error = paste("Error en la petición para InChIKey:", inchi_key)
+    )
+  }
+}
+
+# Limit the rate of requests to avoid crashes
+Sys.sleep(1) 
+
+# Apply the function to each InChIKey and handle errors
+Classification_DF <- map_df(InChI_Keys, function(key) 
+  Sys.sleep(1)  
+  get_classification_custom(key)
+})
+
+# Print the first results for verification
+print(Classification_DF)
+
+# Save of DataFrame CSV file
+write.csv(Classification_DF, "Classification_Results_Practica.csv", row.names = FALSE)
+
+
