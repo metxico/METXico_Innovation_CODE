@@ -1,4 +1,4 @@
-Jorge Xool-Tamayo, & Aldo Moreno-Ulloa. (2025). METXico Innovation CODE GitHub (Versión v1). 
+Xool-Tamayo, J., & Moreno Ulloa, A. (2023). METXico Innovation CODE GitHub (Versión v1). 
 Zenodo. https://doi.org/10.5281/zenodo.15320791
 
 PLEASE REFERENCE THIS WORK AS [metxico - Overview. (n.d.). GitHub. https://github.com/metxico] . 
